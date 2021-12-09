@@ -61,8 +61,9 @@ public class MyRESTController {
         employeeService.saveEmployee(employee);
         return employee;
     }
-    @DeleteMapping("/employees{id}")//удаление
+    @DeleteMapping("/employees/{id}")//удаление
     public String deleteEmployee(@PathVariable int id){
+
         employeeService.deleteEmployee(id);
 
         return "Employee with id =" + id +" was deleted";
