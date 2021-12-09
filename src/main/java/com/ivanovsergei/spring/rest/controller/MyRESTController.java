@@ -4,6 +4,7 @@ import com.ivanovsergei.spring.rest.entity.Employee;
 import com.ivanovsergei.spring.rest.exception_handling.EmployeeIncorrectData;
 import com.ivanovsergei.spring.rest.exception_handling.NoSuchEmployeeException;
 import com.ivanovsergei.spring.rest.service.EmployeeService;
+import org.dom4j.io.ElementModifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,19 +35,27 @@ public class MyRESTController {
         }
         return employee;//json получается автоматически при помощи спринга и джексон датабайнд
     }
-    //локальная обработка исключений
-    @ExceptionHandler//ловим исключение по неверному ид работника (отсутствующий ид в базе)
-    public ResponseEntity<EmployeeIncorrectData> handleException(NoSuchEmployeeException exception){
-        EmployeeIncorrectData data = new EmployeeIncorrectData();
-        data.setInfo(exception.getMessage());//берем сообщение из параметра конструктора исключения
-        return new ResponseEntity<>(data, HttpStatus.NOT_FOUND);
-    }
 
+//    //локальная обработка исключений, заменена на глобальную
+//    @ExceptionHandler//ловим исключение по неверному ид работника (отсутствующий ид в базе)
+//    public ResponseEntity<EmployeeIncorrectData> handleException(NoSuchEmployeeException exception){
+//        EmployeeIncorrectData data = new EmployeeIncorrectData();
+//        data.setInfo(exception.getMessage());//берем сообщение из параметра конструктора исключения
+//        return new ResponseEntity<>(data, HttpStatus.NOT_FOUND);
+//    }
+//
+//
+//    @ExceptionHandler//ловим исключение по вводу символов в ид работника
+//    public ResponseEntity<EmployeeIncorrectData> handleException(Exception exception){
+//        EmployeeIncorrectData data = new EmployeeIncorrectData();
+//        data.setInfo(exception.getMessage());//берем сообщение из параметра конструктора исключения
+//        return new ResponseEntity<>(data, HttpStatus.BAD_REQUEST);
+//    }
 
-    @ExceptionHandler//ловим исключение по вводу символов в ид работника
-    public ResponseEntity<EmployeeIncorrectData> handleException(Exception exception){
-        EmployeeIncorrectData data = new EmployeeIncorrectData();
-        data.setInfo(exception.getMessage());//берем сообщение из параметра конструктора исключения
-        return new ResponseEntity<>(data, HttpStatus.BAD_REQUEST);
+    @PostMapping("/employees")//пост запрос для добавления
+    public Employee addNewEmployee(@RequestBody Employee employee){
+        employeeService.saveEmployee(employee);
+
+        return employee;//спринг и джексон автоматически конветрируют
     }
 }
