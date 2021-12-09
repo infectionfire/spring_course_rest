@@ -54,4 +54,11 @@ public class MyRESTController {
 
         return employee;//спринг и джексон автоматически конветрируют
     }
+
+    @PutMapping("/employees")//put запрос изменения работника
+    public Employee updateNewEmployee(@RequestBody Employee employee){
+
+        employeeService.saveEmployee(employee);
+        return employee;
+    }
 }
