@@ -1,12 +1,13 @@
 package com.ivanovsergei.spring.rest.controller;
 
 import com.ivanovsergei.spring.rest.entity.Employee;
+import com.ivanovsergei.spring.rest.exception_handling.EmployeeIncorrectData;
+import com.ivanovsergei.spring.rest.exception_handling.NoSuchEmployeeException;
 import com.ivanovsergei.spring.rest.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -28,9 +29,24 @@ public class MyRESTController {
     public Employee getEmployee(@PathVariable int id){//с помощью аннтоации передается число в метод и выводится результат
         Employee employee = employeeService.getEmployee(id);
 
+        if (employee ==null){//если работник не найден, вылетит ошибка
+            throw new NoSuchEmployeeException("There is no employee with ID = "+ id + " in Database");
+        }
         return employee;//json получается автоматически при помощи спринга и джексон датабайнд
+    }
+    //локальная обработка исключений
+    @ExceptionHandler//ловим исключение по неверному ид работника (отсутствующий ид в базе)
+    public ResponseEntity<EmployeeIncorrectData> handleException(NoSuchEmployeeException exception){
+        EmployeeIncorrectData data = new EmployeeIncorrectData();
+        data.setInfo(exception.getMessage());//берем сообщение из параметра конструктора исключения
+        return new ResponseEntity<>(data, HttpStatus.NOT_FOUND);
     }
 
 
-
+    @ExceptionHandler//ловим исключение по вводу символов в ид работника
+    public ResponseEntity<EmployeeIncorrectData> handleException(Exception exception){
+        EmployeeIncorrectData data = new EmployeeIncorrectData();
+        data.setInfo(exception.getMessage());//берем сообщение из параметра конструктора исключения
+        return new ResponseEntity<>(data, HttpStatus.BAD_REQUEST);
+    }
 }
